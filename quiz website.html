@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Quiz App</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      /* background: #f4f4f4; */
+      background-color: lightgoldenrodyellow;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .quiz-container {
+      background: #fff;
+      padding: 30px;
+      max-width: 500px;
+      width: 100%;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      margin-bottom: 20px;
+    }
+
+    .question {
+      margin-bottom: 20px;
+    }
+
+    .btn {
+      display: block;
+      background: #3498db;
+      color: white;
+      border: none;
+      padding: 10px;
+      margin: 5px 0;
+      border-radius: 5px;
+      cursor: pointer;
+      width: 100%;
+      transition: 0.3s;
+    }
+
+    .btn:hover {
+      background: #2980b9;
+    }
+
+    .btn.correct {
+      background: #2ecc71;
+    }
+
+    .btn.wrong {
+      background: #e74c3c;
+    }
+
+    #next-btn {
+      margin-top: 20px;
+      display: none;
+    }
+
+    #score {
+      font-weight: bold;
+      font-size: 20px;
+      color: #2c3e50;
+    }
+  </style>
+</head>
+<body>
+
+<div class="quiz-container" id="quiz">
+  <h2 id="question">Question text</h2>
+  <div id="answer-buttons"></div>
+  <button id="next-btn" class="btn">Next</button>
+</div>
+
+<script>
+  const questions = [
+    {
+      question: "What does HTML stand for?",
+      answers: [
+        { text: "Hyper Text Markup Language", correct: true },
+        { text: "Home Tool Markup Language", correct: false },
+        { text: "Hyperlinks and Text Markup Language", correct: false },
+        { text: "Hyperlink Tool Management Language", correct: false }
+      ]
+    },
+    {
+      question: "Which CSS property changes text color?",
+      answers: [
+        { text: "background", correct: false },
+        { text: "color", correct: true },
+        { text: "font-style", correct: false },
+        { text: "text-align", correct: false }
+      ]
+    },
+    {
+      question: "What does JS stand for?",
+      answers: [
+        { text: "Java Syntax", correct: false },
+        { text: "Java Server", correct: false },
+        { text: "JavaScript", correct: true },
+        { text: "Jumpy Script", correct: false }
+      ]
+    },
+    {
+      question: "Which company developed JavaScript?",
+      answers: [
+        { text: "Google", correct: false },
+        { text: "Microsoft", correct: false },
+        { text: "Netscape", correct: true },
+        { text: "IBM", correct: false }
+      ]
+    },
+    {
+      question: "Which HTML tag is used to link CSS?",
+      answers: [
+        { text: "<style>", correct: false },
+        { text: "<link>", correct: true },
+        { text: "<script>", correct: false },
+        { text: "<css>", correct: false }
+      ]
+    },
+    {
+      question: "Which of these is a JavaScript data type?",
+      answers: [
+        { text: "Number", correct: true },
+        { text: "Float", correct: false },
+        { text: "Decimal", correct: false },
+        { text: "Letter", correct: false }
+      ]
+    },
+    {
+      question: "Which symbol is used for comments in JS?",
+      answers: [
+        { text: "//", correct: true },
+        { text: "##", correct: false },
+        { text: "<!--", correct: false },
+        { text: "**", correct: false }
+      ]
+    },
+    {
+      question: "How do you declare a variable in JS?",
+      answers: [
+        { text: "var myVar", correct: true },
+        { text: "variable myVar", correct: false },
+        { text: "v myVar", correct: false },
+        { text: "letVar myVar", correct: false }
+      ]
+    },
+    {
+      question: "Which is a loop in JS?",
+      answers: [
+        { text: "for", correct: true },
+        { text: "repeat", correct: false },
+        { text: "iterate", correct: false },
+        { text: "loop", correct: false }
+      ]
+    },
+    {
+      question: "Which method outputs text in browser console?",
+      answers: [
+        { text: "alert()", correct: false },
+        { text: "console.log()", correct: true },
+        { text: "print()", correct: false },
+        { text: "document.write()", correct: false }
+      ]
+    }
+  ];
+
+  const questionEl = document.getElementById("question");
+  const answerButtons = document.getElementById("answer-buttons");
+  const nextBtn = document.getElementById("next-btn");
+
+  let currentQuestionIndex = 0;
+  let score = 0;
+
+  function startQuiz() {
+    currentQuestionIndex = 0;
+    score = 0;
+    nextBtn.innerHTML = "Next";
+    showQuestion();
+  }
+
+  function showQuestion() {
+    resetState();
+    let currentQuestion = questions[currentQuestionIndex];
+    questionEl.innerText = currentQuestion.question;
+
+    currentQuestion.answers.forEach(answer => {
+      const button = document.createElement("button");
+      button.innerText = answer.text;
+      button.classList.add("btn");
+      if (answer.correct) {
+        button.dataset.correct = answer.correct;
+      }
+      button.addEventListener("click", selectAnswer);
+      answerButtons.appendChild(button);
+    });
+  }
+
+  function resetState() {
+    nextBtn.style.display = "none";
+    while (answerButtons.firstChild) {
+      answerButtons.removeChild(answerButtons.firstChild);
+    }
+  }
+
+  function selectAnswer(e) {
+    const selectedBtn = e.target;
+    const isCorrect = selectedBtn.dataset.correct === "true";
+    if (isCorrect) {
+      selectedBtn.classList.add("correct");
+      score++;
+    } else {
+      selectedBtn.classList.add("wrong");
+    }
+
+    Array.from(answerButtons.children).forEach(button => {
+      button.disabled = true;
+      if (button.dataset.correct === "true") {
+        button.classList.add("correct");
+      }
+    });
+
+    nextBtn.style.display = "block";
+  }
+
+  function showScore() {
+    resetState();
+    questionEl.innerHTML = `Quiz Completed!<br><br>Your Score: <span id="score">${score}/${questions.length}</span>`;
+    nextBtn.innerHTML = "Play Again";
+    nextBtn.style.display = "block";
+  }
+
+  function handleNextButton() {
+    currentQuestionIndex++;
+    if (currentQuestionIndex < questions.length) {
+      showQuestion();
+    } else {
+      showScore();
+    }
+  }
+
+  nextBtn.addEventListener("click", () => {
+    if (currentQuestionIndex < questions.length) {
+      handleNextButton();
+    } else {
+      startQuiz();
+    }
+  });
+
+  startQuiz();
+</script>
+
+</body>
+</html>
